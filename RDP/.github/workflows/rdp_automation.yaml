@@ -1,0 +1,25 @@
+name: RDP Automation
+
+on:
+  workflow_dispatch:  # Manually trigger the workflow
+
+jobs:
+  rdp_automation:
+    runs-on: self-hosted  # Use a self-hosted Windows runner
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: pip install pyautogui
+
+      - name: Run RDP Automation
+        env:
+          PASSWORD: ${secrets.PASSWORD}
+        run: python rdp_automation.py
