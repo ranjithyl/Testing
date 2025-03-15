@@ -1,0 +1,133 @@
+KT Session Outline: Kubernetes and Its Architecture
+1. Introduction to Kubernetes
+What is Kubernetes?
+
+Kubernetes (K8s) is an open-source container orchestration platform designed to automate the deployment, scaling, and management of containerized applications.
+
+It was originally developed by Google and is now maintained by the Cloud Native Computing Foundation (CNCF).
+
+Why Kubernetes?
+
+Simplifies container management.
+
+Provides high availability, scalability, and self-healing capabilities.
+
+Enables DevOps practices like CI/CD, rolling updates, and blue-green deployments.
+
+2. Key Features of Kubernetes
+Automated Scheduling: Automatically places containers based on resource requirements and constraints.
+
+Self-Healing: Restarts failed containers, replaces and reschedules containers when nodes die.
+
+Horizontal Scaling: Automatically scales applications up or down based on CPU usage or custom metrics.
+
+Service Discovery and Load Balancing: Automatically assigns IPs and DNS names to containers and distributes traffic.
+
+Storage Orchestration: Automatically mounts storage systems (local, cloud, etc.).
+
+Rolling Updates and Rollbacks: Updates applications with zero downtime and allows rollbacks if something goes wrong.
+
+3. Kubernetes Architecture
+Kubernetes follows a master-worker architecture. The main components are:
+
+A. Control Plane (Master Node)
+kube-apiserver:
+
+The front-end for the Kubernetes control plane.
+
+Exposes the Kubernetes API for all operations.
+
+etcd:
+
+A distributed key-value store used to store all cluster data (e.g., configurations, states).
+
+kube-scheduler:
+
+Watches for newly created pods and assigns them to nodes based on resource availability.
+
+kube-controller-manager:
+
+Runs controller processes (e.g., Node Controller, Replication Controller) to regulate the state of the cluster.
+
+cloud-controller-manager (optional):
+
+Manages cloud-specific controllers (e.g., load balancers, storage).
+
+B. Worker Nodes
+kubelet:
+
+An agent that runs on each node and ensures containers are running in a pod.
+
+kube-proxy:
+
+Maintains network rules to allow communication to and from pods.
+
+Container Runtime:
+
+Software that runs containers (e.g., Docker, containerd, CRI-O).
+
+C. Add-ons
+DNS (CoreDNS): Provides DNS services for the cluster.
+
+Dashboard: Web-based UI for managing the cluster.
+
+Ingress Controller: Manages external access to services.
+
+CNI (Container Network Interface): Provides networking for pods (e.g., Calico, Flannel).
+
+4. Kubernetes Objects
+Pods:
+
+The smallest deployable unit in Kubernetes.
+
+Contains one or more containers that share storage and network.
+
+Deployments:
+
+Manages stateless applications.
+
+Ensures a specified number of pod replicas are running.
+
+Services:
+
+Exposes pods to the network (ClusterIP, NodePort, LoadBalancer).
+
+ConfigMaps and Secrets:
+
+Store configuration data and sensitive information, respectively.
+
+Persistent Volumes (PVs) and Persistent Volume Claims (PVCs):
+
+Manage storage for stateful applications.
+
+Namespaces:
+
+Logical partitions for organizing resources in a cluster.
+
+5. Kubernetes Workflow
+Step 1: Define the desired state of your application using YAML/JSON manifests.
+
+Step 2: Submit the manifest to the Kubernetes API server.
+
+Step 3: The scheduler assigns pods to nodes.
+
+Step 4: The kubelet on each node ensures the containers are running.
+
+Step 5: Controllers continuously monitor and maintain the desired state.
+
+6. Demo (Optional)
+Deploy a Simple Application:
+
+Create a Deployment YAML file.
+
+Expose the application using a Service.
+
+Show how to scale the application.
+
+Basic Commands:
+
+kubectl get pods
+
+kubectl apply -f <file.yaml>
+
+kubectl scale deployment <deployment-name> --replicas=3
