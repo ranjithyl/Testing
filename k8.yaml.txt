@@ -1,0 +1,141 @@
+---
+# 1. Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: my-app-namespace
+
+---
+# 2. ConfigMap (for configuration data)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-app-config
+  namespace: my-app-namespace
+data:
+  APP_COLOR: blue
+  APP_ENV: production
+
+---
+# 3. Secret (for sensitive data)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-app-secret
+  namespace: my-app-namespace
+type: Opaque
+data:
+  DB_USER: YWRtaW4=  # base64 encoded "admin"
+  DB_PASSWORD: cGFzc3dvcmQ=  # base64 encoded "password"
+
+---
+# 4. PersistentVolumeClaim (for storage)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-app-pvc
+  namespace: my-app-namespace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# 5. Deployment (to manage the application pods)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-deployment
+  namespace: my-app-namespace
+  labels:
+    app: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+        - name: my-app-container
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: APP_COLOR
+              valueFrom:
+                configMapKeyRef:
+                  name: my-app-config
+                  key: APP_COLOR
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: my-app-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-app-secret
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: my-app-storage
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: my-app-storage
+          persistentVolumeClaim:
+            claimName: my-app-pvc
+
+---
+# 6. Service (to expose the application)
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+  namespace: my-app-namespace
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: my-app
+
+
+
+
+===============================================
+Explanation of the Manifest
+Namespace:
+
+Creates a namespace called my-app-namespace to isolate resources.
+
+ConfigMap:
+
+Stores non-sensitive configuration data (APP_COLOR and APP_ENV).
+
+Secret:
+
+Stores sensitive data like database credentials (DB_USER and DB_PASSWORD).
+
+PersistentVolumeClaim (PVC):
+
+Requests 1Gi of storage for the application.
+
+Deployment:
+
+Manages 3 replicas of the nginx container.
+
+Uses environment variables from the ConfigMap and Secret.
+
+Mounts the PVC to the container at /usr/share/nginx/html.
+
+Service:
+
+Exposes the application externally using a LoadBalancer.
+
+Routes traffic to pods with the label app: my-app.
