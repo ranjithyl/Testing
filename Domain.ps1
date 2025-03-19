@@ -103,3 +103,29 @@ Write-Host "Instance $InstanceId successfully renamed and joined to $DomainName"
 
 # Close the remote session
 Remove-PSSession -Session $Session
+
+
+
+
+
+
+=========================================
+For multiple groups
+# Prompt for Administrator Credentials
+$credential = Get-Credential
+
+# List of users/groups to add (Modify as needed)
+$Members = @("IT-Support", "JohnDoe", "HelpDesk")  # Add multiple users/groups here
+
+# Run command remotely on the local machine with elevated privileges
+foreach ($Member in $Members) {
+    try {
+        Invoke-Command -ScriptBlock {
+            param ($User)
+            Add-LocalGroupMember -Group "Administrators" -Member $User -ErrorAction Stop
+            Write-Host "Successfully added $User to Administrators group" -ForegroundColor Green
+        } -ArgumentList $Member -Credential $credential
+    } catch {
+        Write-Host "Failed to add $Member. Error: $_" -ForegroundColor Red
+    }
+}
