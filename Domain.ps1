@@ -64,6 +64,41 @@ try {
     exit
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=============================
+# Prompt for Administrator Credentials
+$credential = Get-Credential
+
+# Specify the user or group to be added
+$NewGroupName = "IT-Support"  # Change this to the user/group you want to add
+
+# Run the command remotely on the local machine with elevated privileges
+Invoke-Command -ScriptBlock {
+    param ($User)
+    Add-LocalGroupMember -Group "Administrators" -Member $User
+    Write-Host "Successfully added $User to Administrators group" -ForegroundColor Green
+} -ArgumentList $NewGroupName -Credential $credential
+
+
 Write-Host "Instance $InstanceId successfully renamed and joined to $DomainName" -ForegroundColor Green
 
 # Close the remote session
