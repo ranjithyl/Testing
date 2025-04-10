@@ -324,3 +324,127 @@ Service	Exposes Pods internally or externally
 ConfigMap	Stores non-sensitive config data
 Secret	Stores sensitive credentials securely
 Ingress	Manages external HTTP/HTTPS access
+
+
+
+
+
+############
+Here is a single Kubernetes manifest file that contains a deployment, services, ingress, secret, configmap, and persistent volume (PV):
+
+```
+apiVersion: v1
+kind: List
+items:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: example-deployment
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app: example
+      template:
+        metadata:
+          labels:
+            app: example
+        spec:
+          containers:
+          - name: example-container
+            image: example/image
+            ports:
+            - containerPort: 80
+            volumeMounts:
+            - name: example-pvc
+              mountPath: /mnt/data
+          volumes:
+          - name: example-pvc
+            persistentVolumeClaim:
+              claimName: example-pvc
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: example-service
+    spec:
+      selector:
+        app: example
+      ports:
+      - name: http
+        port: 80
+        targetPort: 80
+      type: ClusterIP
+
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: example-ingress
+    spec:
+      rules:
+      - host: example.com
+        http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: example-service
+                port:
+                  number: 80
+
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: example-secret
+    type: Opaque
+    data:
+      username: <base64 encoded username>
+      password: <base64 encoded password>
+
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: example-configmap
+    data:
+      config.properties: |
+        key1=value1
+        key2=value2
+
+  - apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: example-pv
+    spec:
+      capacity:
+        storage: 1Gi
+      accessModes:
+        - ReadWriteOnce
+      persistentVolumeReclaimPolicy: Retain
+      local:
+        path: /mnt/data
+      storageClassName: local-storage
+
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: example-pvc
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+```
+
+This manifest file defines the following resources:
+
+- A deployment named `example-deployment` with 3 replicas.
+- A service named `example-service` that selects the `example-deployment` pods.
+- An ingress named `example-ingress` that routes traffic to the `example-service` service.
+- A secret named `example-secret` that stores a username and password.
+- A configmap named `example-configmap` that stores a configuration file.
+- A persistent volume (PV) named `example-pv` that provides 1Gi of storage.
+- A persistent volume claim (PVC) named `example-pvc` that requests 1Gi of storage.
+
+Note that you will need to replace the `<base64 encoded username>` and `<base64 encoded password>` placeholders in the secret with the actual base64 encoded values. Additionally, you may need to modify the storage class and local path in the PV definition to match your specific environment.
